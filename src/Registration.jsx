@@ -1,10 +1,12 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import InputField from "./Components/inputField";
 import Button from "./Components/Button";
+import Users from "./Users";
 
 const RegistrationForm = () => {
+  const [users, setUsers] = useState([]);
   const [formData, setFormData] = useState({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -18,52 +20,88 @@ const RegistrationForm = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    console.log("Form submitted with data:", formData);
+    try {
+      const response = await fetch("http://localhost:3000//api/users", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      if (response.ok) {
+        const newUser = await response.json();
+        console.log("New user created successfully", newUser);
+        setUsers([...users, newUser.user]);
 
-    setFormData({
-      username: "",
-      email: "",
-      password: "",
-      confirmPassword: "",
-    });
+        setFormData({
+          name: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+        });
+      } else {
+        console.error("Failed to add user:", response.statusText);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+    console.log("Form submitted with data:", formData);
   };
+  useEffect(() => {
+    const fetchData = async () => {
+      await fetch("http://localhost:3000/api/users")
+        .then((response) => response.json())
+        .then((data) => {
+          console.log(data);
+          setUsers(data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    };
+
+    fetchData();
+  }, []);
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
-      <InputField
-        label="Username:"
-        type="text"
-        name="username"
-        value={formData.username}
-        onChange={handleInputChange}
-      />
-      <InputField
-        label="Email:"
-        type="text"
-        name="email"
-        value={formData.email}
-        onChange={handleInputChange}
-      />
+    <>
+      <form onSubmit={handleSubmit} className="max-w-md mx-auto mt-8">
+        <InputField
+          label="Name:"
+          type="text"
+          name="name"
+          value={formData.name}
+          onChange={handleInputChange}
+        />
+        <InputField
+          label="Email:"
+          type="text"
+          name="email"
+          value={formData.email}
+          onChange={handleInputChange}
+        />
 
-      <InputField
-        label="Password:"
-        type="password"
-        name="password"
-        value={formData.password}
-        onChange={handleInputChange}
-      />
-      <InputField
-        label="Confirm Password:"
-        type="password"
-        name="confirmPassword"
-        value={formData.confirmPassword}
-        onChange={handleInputChange}
-      />
-      <Button label="Submit" />
-    </form>
+        <InputField
+          label="Password:"
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleInputChange}
+        />
+        <InputField
+          label="Confirm Password:"
+          type="password"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleInputChange}
+        />
+        <Button label="Submit" />
+      </form>
+      <Users users={users} />
+    </>
   );
 };
 
