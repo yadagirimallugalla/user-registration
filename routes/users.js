@@ -21,8 +21,9 @@ router.post("/", async (req, res) => {
   try {
     const savedUser = await user.save();
     res.json(savedUser);
-  } catch (error) {}
-  res.json({ message: error });
+  } catch (error) {
+    res.json({ message: "Failed to add create user" });
+  }
 });
 
 router.get("/:id", async (req, res) => {
