@@ -1,3 +1,4 @@
+import PropTypes from "prop-types";
 export default function Button({ label, type }) {
   return (
     <button
@@ -8,3 +9,7 @@ export default function Button({ label, type }) {
     </button>
   );
 }
+Button.propTypes = {
+  label: PropTypes.string,
+  type: PropTypes.string,
+};

@@ -2,15 +2,19 @@ import { useState, useEffect } from "react";
 import InputField from "./Components/inputField";
 import Button from "./Components/Button";
 import Users from "./Users";
+import useServices from "./hooks/useServices";
+const form = {
+  name: "",
+  email: "",
+  password: "",
+  confirmPassword: "",
+};
 
 const RegistrationForm = () => {
   const [users, setUsers] = useState([]);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
+  const [formData, setFormData] = useState(form);
+
+  const services = useServices({ setUsers });
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -20,51 +24,21 @@ const RegistrationForm = () => {
     }));
   };
 
+  useEffect(() => {
+    services.fetchUsers();
+  }, [services]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
-      const response = await fetch("http://localhost:3000//api/users", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-      if (response.ok) {
-        const newUser = await response.json();
-        console.log("New user created successfully", newUser);
-        setUsers([...users, newUser.user]);
-
-        setFormData({
-          name: "",
-          email: "",
-          password: "",
-          confirmPassword: "",
-        });
-      } else {
-        console.error("Failed to add user:", response.statusText);
-      }
+      await services.sendUsers(formData);
+      console.log("Form submitted with data:", formData);
     } catch (error) {
       console.error(error);
     }
     console.log("Form submitted with data:", formData);
+    setFormData(form);
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      await fetch("http://localhost:3000/api/users")
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setUsers(data);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-        });
-    };
-
-    fetchData();
-  }, []);
 
   return (
     <>
