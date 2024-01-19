@@ -6,6 +6,8 @@ const usersRoute = require("./routes/users");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 
+const port = process.env.PORT || 3000;
+
 app.use(cors({ origin: "http://localhost:5173" }));
 
 app.use(bodyParser.json());
@@ -16,4 +18,6 @@ mongoose.connect(process.env.mongoURI);
 mongoose.connection.on("connected", () => {
   console.log("connected to DB");
 });
-app.listen(3000);
+app.listen(port, () => {
+  console.log(`Server is running on the port ${port}`);
+});
