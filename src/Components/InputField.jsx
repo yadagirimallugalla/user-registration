@@ -1,4 +1,11 @@
-export default function InputField({ label, type, name, value, onChange }) {
+export default function InputField({
+  label,
+  type,
+  name,
+  value,
+  onChange,
+  defaultValue,
+}) {
   return (
     <div className="mb-6">
       <label className="block text-gray-700 text-sm font-bold mb-2">
@@ -10,6 +17,7 @@ export default function InputField({ label, type, name, value, onChange }) {
         name={name}
         value={value}
         onChange={onChange}
+        defaultValue={defaultValue}
       />
     </div>
   );
