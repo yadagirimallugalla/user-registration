@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 router.get("/", async (req, res) => {
   // res.send("Hello");
@@ -13,12 +14,15 @@ router.get("/", async (req, res) => {
 });
 
 router.post("/", async (req, res) => {
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-  });
+  const { name, email, password } = req.body;
+
   try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      name,
+      email,
+      password: hashedPassword,
+    });
     const savedUser = await user.save();
     res.json(savedUser);
   } catch (error) {
@@ -46,14 +50,17 @@ router.delete("/:id", async (req, res) => {
 });
 
 router.patch("/:id", async (req, res) => {
+  const { name, email, password } = req.body;
   try {
+    const hashPassword = await bcrypt.hash(password, 10);
+
     const updatedUser = await User.updateOne(
       { _id: req.params.id },
       {
         $set: {
-          name: req.body.name,
-          email: req.body.email,
-          password: req.body.password,
+          name,
+          email,
+          password: hashPassword,
         },
       }
     );
